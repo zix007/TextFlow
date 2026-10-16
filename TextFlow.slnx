@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TextFlow.Core/TextFlow.Core.csproj" />
+    <Project Path="src/TextFlow/TextFlow.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TextFlow.Tests/TextFlow.Tests.csproj" />
+  </Folder>
+</Solution>

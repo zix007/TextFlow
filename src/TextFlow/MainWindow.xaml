@@ -1,0 +1,449 @@
+<Window
+    x:Class="TextFlow.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TextFlow"
+    xmlns:views="using:TextFlow.Views"
+    xmlns:vm="using:TextFlow.ViewModels"
+    xmlns:models="using:TextFlow.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TextFlow Pro">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <Grid.RowDefinitions>
+            <!-- 0. Unified Toolbar + Menu -->
+            <RowDefinition Height="Auto" />
+            <!-- 1. Editor / Tabs Content -->
+            <RowDefinition Height="*" />
+            <!-- 2. Status Bar -->
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 0. Unified Toolbar + Menu + Modern TitleBar -->
+        <Border Grid.Row="0"
+                x:Name="AppTitleBar"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="6,0"
+                MinHeight="44">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <!-- App Icon & Title (Left) -->
+                    <ColumnDefinition Width="Auto" />
+                    <!-- Menu Bar (Left) -->
+                    <ColumnDefinition Width="Auto" />
+                    <!-- Draggable Space (Center) -->
+                    <ColumnDefinition Width="*" />
+                    <!-- System Caption Buttons Inset (Right) -->
+                    <ColumnDefinition x:Name="RightPaddingColumn" Width="140" />
+                </Grid.ColumnDefinitions>
+
+                <!-- App Icon & Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="6,0,8,0">
+                    <Image Source="ms-appx:///Assets/Square44x44Logo.targetsize-24_altform-unplated.png" Width="18" Height="18" VerticalAlignment="Center" />
+                    <TextBlock Text="TextFlow Pro" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <MenuBar Grid.Column="1" VerticalAlignment="Center">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="New Document" Icon="Document" Command="{x:Bind ViewModel.CreateNewDocumentCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="N" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="New Tab" Icon="Add" Command="{x:Bind ViewModel.CreateNewDocumentCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="T" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="New Window" Click="OnNewWindowClick">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE78B;" />
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="N" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Open..." Icon="OpenFile" Command="{x:Bind ViewModel.OpenFileCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="O" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Save" Icon="Save" Command="{x:Bind ViewModel.SaveFileCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="S" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Save As..." Icon="SaveLocal" Command="{x:Bind ViewModel.SaveAsFileCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="S" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Save All" Command="{x:Bind ViewModel.SaveAllFilesCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="A" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Close Tab" Icon="Cancel" Click="OnCloseCurrentTabClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="W" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Exit" Click="OnExitClick" />
+            </MenuBarItem>
+
+            <MenuBarItem Title="Edit">
+                <MenuFlyoutItem Text="Undo" Icon="Undo" Click="OnUndoClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Z" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Redo" Icon="Redo" Click="OnRedoClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Y" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Cut" Icon="Cut" Click="OnCutClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="X" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Copy" Icon="Copy" Click="OnCopyClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="C" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Paste" Icon="Paste" Click="OnPasteClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="V" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Select All" Icon="SelectAll" Click="OnSelectAllClick">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="A" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Find..." Icon="Find" Command="{x:Bind ViewModel.OpenFindCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="F" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Replace..." Command="{x:Bind ViewModel.OpenReplaceCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8AB;" />
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="H" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+            </MenuBarItem>
+
+            <MenuBarItem Title="View">
+                <ToggleMenuFlyoutItem Text="Word Wrap" IsChecked="{x:Bind ViewModel.WordWrap, Mode=TwoWay}" Command="{x:Bind ViewModel.ToggleWordWrapCommand}" />
+                <ToggleMenuFlyoutItem Text="Line Numbers" IsChecked="{x:Bind ViewModel.LineNumbers, Mode=TwoWay}" Command="{x:Bind ViewModel.ToggleLineNumbersCommand}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Zoom In" Icon="ZoomIn" Command="{x:Bind ViewModel.ZoomInCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Add" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Zoom Out" Icon="ZoomOut" Command="{x:Bind ViewModel.ZoomOutCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Subtract" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Reset Zoom" Command="{x:Bind ViewModel.ResetZoomCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Number0" />
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutSubItem Text="Theme">
+                    <MenuFlyoutItem Text="System Theme" Click="OnSetSystemTheme" />
+                    <MenuFlyoutItem Text="Light Theme" Click="OnSetLightTheme" />
+                    <MenuFlyoutItem Text="Dark Theme" Click="OnSetDarkTheme" />
+                </MenuFlyoutSubItem>
+            </MenuBarItem>
+
+            <MenuBarItem Title="Tools">
+                <MenuFlyoutItem Text="Sync with Google Drive" Icon="Sync" Command="{x:Bind ViewModel.SyncCloudCommand}" />
+                <MenuFlyoutItem Text="Google Drive Account..." Click="OnOpenGoogleDriveDialog" />
+                <MenuFlyoutItem Text="Compare Documents..." Click="OnOpenCompareDialog" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutSubItem Text="AI Assistant">
+                    <MenuFlyoutItem Text="Summarize Document" Command="{x:Bind ViewModel.SummarizeDocumentWithAiCommand}" />
+                    <MenuFlyoutItem Text="Explain SQL Query" Command="{x:Bind ViewModel.ExplainSqlWithAiCommand}" />
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Preferences..." Icon="Setting" Click="OnOpenSettingsDialog" />
+            </MenuBarItem>
+
+            <MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="Crash Recovery..." Click="OnOpenRecoveryDialog" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="About TextFlow..." Click="OnAboutClick" />
+            </MenuBarItem>
+        </MenuBar>
+
+                <!-- Draggable Center Area -->
+                <Grid Grid.Column="2" Background="Transparent" />
+            </Grid>
+        </Border>
+
+        <!-- 2. Multi-Tab Editor Area -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TabView x:Name="DocTabView"
+                     Grid.Row="0"
+                     TabWidthMode="SizeToContent"
+                     CanReorderTabs="True"
+                     CanDragTabs="True"
+                     TabItemsSource="{x:Bind ViewModel.Documents, Mode=OneWay}"
+                     SelectedItem="{x:Bind ViewModel.SelectedDocument, Mode=TwoWay}"
+                     SelectedIndex="{x:Bind ViewModel.SelectedTabIndex, Mode=TwoWay}"
+                     AddTabButtonClick="OnAddTabButtonClick"
+                     TabCloseRequested="OnTabCloseRequested">
+
+                <!-- Tab Header Template -->
+                <TabView.TabItemTemplate>
+                    <DataTemplate x:DataType="vm:DocumentViewModel">
+                        <TabViewItem Header="{x:Bind HeaderTitle, Mode=OneWay}"
+                                     PointerPressed="OnTabPointerPressed">
+                            <TabViewItem.IconSource>
+                                <FontIconSource Glyph="{x:Bind IconGlyph, Mode=OneWay}" />
+                            </TabViewItem.IconSource>
+                        </TabViewItem>
+                    </DataTemplate>
+                </TabView.TabItemTemplate>
+            </TabView>
+
+            <!-- Editor Content Area for Active Document -->
+            <Grid Grid.Row="1"
+                  AllowDrop="True"
+                  DragOver="OnEditorDragOver"
+                  Drop="OnEditorDrop">
+                
+                <Grid.ColumnDefinitions>
+                    <!-- Line Numbers Column -->
+                    <ColumnDefinition Width="Auto" />
+                    <!-- Editor Column -->
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Line Numbers Column -->
+                <Border Grid.Column="0"
+                        MinWidth="45"
+                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,1,0"
+                        Padding="6,8,8,8"
+                        Visibility="{x:Bind ViewModel.LineNumbers, Mode=OneWay}">
+                    <ScrollViewer x:Name="LineNumbersScrollViewer"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock Text="{x:Bind ViewModel.SelectedDocument.LineNumbersText, Mode=OneWay}"
+                                   FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                   FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
+                                   TextAlignment="Right"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   Opacity="0.8" />
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Main Text Editor -->
+                <Grid Grid.Column="1">
+
+                    <TextBox x:Name="MainEditorTextBox"
+                             AcceptsReturn="True"
+                             TextWrapping="{x:Bind local:MainWindow.BoolToWrap(ViewModel.WordWrap), Mode=OneWay}"
+                             FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                             FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
+                             FontWeight="{x:Bind local:MainWindow.GetFontWeight(ViewModel.FontStyle), Mode=OneWay}"
+                             FontStyle="{x:Bind local:MainWindow.GetFontStyle(ViewModel.FontStyle), Mode=OneWay}"
+                             BorderThickness="0"
+                             Padding="12,8"
+                             Background="Transparent"
+                             SelectionChanged="OnEditorSelectionChanged"
+                             TextChanged="OnEditorTextChanged"
+                             Text="{x:Bind ViewModel.SelectedDocument.Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.Resources>
+                            <SolidColorBrush x:Key="TextControlBackground" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+                            <Thickness x:Key="TextControlBorderThemeThickness">0</Thickness>
+                            <Thickness x:Key="TextControlBorderThemeThicknessFocused">0</Thickness>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <!-- Floating Find & Replace Panel -->
+                    <Border x:Name="FindReplaceBar"
+                            Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12"
+                            Margin="0,0,16,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Visibility="{x:Bind local:MainWindow.BoolToVisibility(ViewModel.FindReplace.IsOpen), Mode=OneWay}">
+                        <StackPanel Spacing="8" Width="360">
+                            <!-- Find Row -->
+                            <Grid ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0"
+                                         PlaceholderText="Find..."
+                                         Text="{x:Bind ViewModel.FindReplace.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <Button Grid.Column="1"
+                                        ToolTipService.ToolTip="Previous"
+                                        Command="{x:Bind ViewModel.FindReplace.FindPreviousCommand}">
+                                    <FontIcon Glyph="&#xE70E;" FontSize="12" />
+                                </Button>
+
+                                <Button Grid.Column="2"
+                                        ToolTipService.ToolTip="Next"
+                                        Command="{x:Bind ViewModel.FindReplace.FindNextCommand}">
+                                    <FontIcon Glyph="&#xE70D;" FontSize="12" />
+                                </Button>
+
+                                <Button Grid.Column="3"
+                                        ToolTipService.ToolTip="Close (Esc)"
+                                        Command="{x:Bind ViewModel.FindReplace.CloseCommand}">
+                                    <FontIcon Glyph="&#xE711;" FontSize="12" />
+                                </Button>
+                            </Grid>
+
+                            <!-- Replace Row -->
+                            <Grid ColumnSpacing="6" Visibility="{x:Bind local:MainWindow.BoolToVisibility(ViewModel.FindReplace.IsReplaceMode), Mode=OneWay}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0"
+                                         PlaceholderText="Replace with..."
+                                         Text="{x:Bind ViewModel.FindReplace.ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <Button Grid.Column="1"
+                                        Content="Replace"
+                                        Command="{x:Bind ViewModel.FindReplace.ReplaceCurrentCommand}" />
+
+                                <Button Grid.Column="2"
+                                        Content="All"
+                                        ToolTipService.ToolTip="Replace All"
+                                        Command="{x:Bind ViewModel.FindReplace.ReplaceAllCommand}" />
+                            </Grid>
+
+                            <!-- Options Row -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                                    <ToggleButton IsChecked="{x:Bind ViewModel.FindReplace.MatchCase, Mode=TwoWay}"
+                                                  Padding="6,4"
+                                                  ToolTipService.ToolTip="Match Case (Aa)">
+                                        <TextBlock Text="Aa" FontWeight="SemiBold" FontSize="11" />
+                                    </ToggleButton>
+
+                                    <ToggleButton IsChecked="{x:Bind ViewModel.FindReplace.WholeWord, Mode=TwoWay}"
+                                                  Padding="6,4"
+                                                  ToolTipService.ToolTip="Match Whole Word">
+                                        <TextBlock Text="[ab]" FontWeight="SemiBold" FontSize="11" />
+                                    </ToggleButton>
+
+                                    <ToggleButton IsChecked="{x:Bind ViewModel.FindReplace.UseRegex, Mode=TwoWay}"
+                                                  Padding="6,4"
+                                                  ToolTipService.ToolTip="Use Regular Expressions (.*)">
+                                        <TextBlock Text=".*" FontWeight="SemiBold" FontSize="11" />
+                                    </ToggleButton>
+
+                                    <ToggleButton IsChecked="{x:Bind ViewModel.FindReplace.IsReplaceMode, Mode=TwoWay}"
+                                                  Padding="6,4"
+                                                  ToolTipService.ToolTip="Toggle Replace Mode">
+                                        <FontIcon Glyph="&#xE8AB;" FontSize="12" />
+                                    </ToggleButton>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{x:Bind ViewModel.FindReplace.StatusMessage, Mode=OneWay}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right"
+                                           FontSize="11"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- 3. Status Bar -->
+        <Border Grid.Row="2"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left info -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{x:Bind ViewModel.GlobalStatusText, Mode=OneWay}"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ProgressBar IsIndeterminate="True"
+                                 Width="100"
+                                 VerticalAlignment="Center"
+                                 Visibility="{x:Bind local:MainWindow.BoolToVisibility(ViewModel.IsBusy), Mode=OneWay}" />
+                </StackPanel>
+
+                <!-- Right info: Ln, Col, Zoom, Encoding, Sync -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{x:Bind local:MainWindow.FormatCursor(ViewModel.SelectedDocument.LineNumber, ViewModel.SelectedDocument.ColumnNumber), Mode=OneWay}"
+                               FontSize="12" />
+                    
+                    <TextBlock Text="{x:Bind local:MainWindow.FormatZoom(ViewModel.FontSize), Mode=OneWay}"
+                               FontSize="12" />
+
+                    <TextBlock Text="{x:Bind ViewModel.SelectedDocument.EncodingDisplayName, Mode=OneWay}"
+                               FontSize="12" />
+
+                    <TextBlock Text="{x:Bind ViewModel.SelectedDocument.FileExtension, Mode=OneWay}"
+                               FontSize="12" FontWeight="SemiBold" />
+
+                    <TextBlock Text="{x:Bind ViewModel.SelectedDocument.SyncStatusDisplayName, Mode=OneWay}"
+                               FontSize="12"
+                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

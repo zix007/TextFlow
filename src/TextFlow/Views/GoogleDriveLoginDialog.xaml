@@ -1,0 +1,61 @@
+<ContentDialog
+    x:Class="TextFlow.Views.GoogleDriveLoginDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:TextFlow.ViewModels"
+    mc:Ignorable="d"
+    Title="Google Drive Cloud Synchronization"
+    CloseButtonText="Close">
+
+    <Grid Width="460" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+            <FontIcon Glyph="&#xE8B9;" FontSize="32" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Google Drive Integration" FontWeight="SemiBold" FontSize="16" />
+                <TextBlock Text="{x:Bind ViewModel.StatusText, Mode=OneWay}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="10">
+            <TextBox Header="OAuth 2.0 Client ID"
+                     Text="{x:Bind ViewModel.ClientId, Mode=TwoWay}"
+                     PlaceholderText="Enter Client ID from Google Cloud Console" />
+
+            <PasswordBox Header="Client Secret"
+                         Password="{x:Bind ViewModel.ClientSecret, Mode=TwoWay}" />
+
+            <TextBox Header="Cloud Sync Folder Name"
+                     Text="{x:Bind ViewModel.SyncFolder, Mode=TwoWay}"
+                     PlaceholderText="TextFlowDocs" />
+        </StackPanel>
+
+        <ProgressBar Grid.Row="2"
+                     IsIndeterminate="True"
+                     Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Sync Now"
+                    Command="{x:Bind ViewModel.SyncNowCommand}"
+                    IsEnabled="{x:Bind ViewModel.IsAuthenticated, Mode=OneWay}" />
+
+            <Button Content="Sign In"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    Command="{x:Bind ViewModel.SignInCommand}"
+                    Visibility="{x:Bind BoolToNegatedVisibility(ViewModel.IsAuthenticated), Mode=OneWay}" />
+
+            <Button Content="Sign Out"
+                    Command="{x:Bind ViewModel.SignOutCommand}"
+                    Visibility="{x:Bind BoolToVisibility(ViewModel.IsAuthenticated), Mode=OneWay}" />
+        </StackPanel>
+    </Grid>
+</ContentDialog>

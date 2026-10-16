@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TextFlow (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TextFlow (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

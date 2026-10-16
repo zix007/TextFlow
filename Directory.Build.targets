@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="RemoveDuplicateCommunityToolkitAnalyzers" BeforeTargets="CoreCompile;GenerateSources">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(FileName)' == 'CommunityToolkit.Mvvm.SourceGenerators' and $([System.String]::Copy('%(FullPath)').Contains('roslyn4.0'))" />
+      <Analyzer Remove="@(Analyzer)" Condition="'%(FileName)' == 'CommunityToolkit.Mvvm.CodeFixers' and $([System.String]::Copy('%(FullPath)').Contains('roslyn4.0'))" />
+      <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
+      <Analyzer Remove="@(Analyzer)" />
+      <Analyzer Include="@(FilteredAnalyzer)" />
+    </ItemGroup>
+  </Target>
+</Project>
